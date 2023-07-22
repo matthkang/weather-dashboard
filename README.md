@@ -25,3 +25,4 @@
 
 ## Credits
 - https://stackoverflow.com/questions/3304014/how-to-interpolate-variables-in-strings-in-javascript-without-concatenation
+- https://stackoverflow.com/questions/17634019/javascript-load-an-image-from-url-and-display
