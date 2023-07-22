@@ -24,3 +24,4 @@
 
 
 ## Credits
+- https://stackoverflow.com/questions/3304014/how-to-interpolate-variables-in-strings-in-javascript-without-concatenation
