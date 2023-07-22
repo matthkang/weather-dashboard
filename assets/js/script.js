@@ -2,6 +2,7 @@ var cityFormEl = document.querySelector('#city-form');
 var cityInputEl = document.querySelector('#cityInput');
 
 var presentForecast = document.querySelector('#present-forecast');
+var futureForecast = document.querySelector('#future-forecast');
 
 var currentCity = document.querySelector('#city');
 var currentTemp = document.querySelector('#temp');
@@ -108,9 +109,9 @@ var displayCurrentWeather = function (data) {
     h3Humidity.setAttribute('id', 'humidity');
     
 
-    h3Temp.textContent += ("Temp: " + temp + ' °F');
-    h3Wind.textContent += ("Wind: " + wind + ' MPH');
-    h3Humidity.textContent += ("Humidity: " + humidity + '%');
+    h3Temp.textContent = ("Temp: " + temp + ' °F');
+    h3Wind.textContent = ("Wind: " + wind + ' MPH');
+    h3Humidity.textContent = ("Humidity: " + humidity + '%');
 
     presentForecast.appendChild(h3Temp);
     presentForecast.appendChild(h3Wind);
@@ -128,7 +129,7 @@ var get5DayWeather = function (lat, lon) {
                 console.log(response);
                 response.json().then(function (data) {
                     console.log("5 day forecast: ", data);
-                    // displayRepos(data, user);
+                    display5DayForecast(data);
                 });
             } else {
                 alert('Error: ' + response.statusText);
@@ -137,6 +138,64 @@ var get5DayWeather = function (lat, lon) {
         .catch(function (error) {
             alert('Unable to connect to openweathermap API');
         });
+};
+
+var display5DayForecast = function (data) {
+    var row = document.createElement('div');
+    row.classList = 'row';
+
+    for (var i = 1; i < 6; i++){
+        var col = document.createElement('div');
+        col.classList = 'col card';
+
+        // add date for next 5 days
+        var h5El = document.createElement('h5');
+        h5El.setAttribute('id', 'date-' + i);
+        h5El.classList = 'card-header text-uppercase';
+
+        var date = dayjs().add(i, 'day').format('MM/DD/YYYY');
+        h5El.textContent = date;
+
+        // weather icon
+        var icon = document.createElement('span');
+        icon.setAttribute('id', 'icon-' + i);
+
+        var ind = (i-1)*8;
+        var dataIndex = data.list[ind];
+        var val = dataIndex.weather[0].icon,
+        src = 'https://openweathermap.org/img/wn/' + val + '@2x.png',
+        img = document.createElement('img');
+
+        img.src = src;
+        var weatherIcon = img;
+        h5El.appendChild(weatherIcon);
+
+        var tempVal = dataIndex.main.temp;
+        var windVal = dataIndex.wind.speed;
+        var humidityVal = dataIndex.main.humidity;
+
+        // temperature
+        var temp = document.createElement('h6');
+        temp.setAttribute('id', 'temp-' + i);
+        temp.textContent = ("Temp: " + tempVal + ' °F');
+        // wind
+        var wind = document.createElement('h6');
+        wind.setAttribute('id', 'wind-' + i);
+        wind.textContent = ("Wind: " + windVal + ' MPH');
+        // humidity
+        var humidity = document.createElement('h6');
+        humidity.setAttribute('id', 'humidity-' + i);
+        humidity.textContent = ("Humidity: " + humidityVal + '%');
+
+        row.appendChild(col);
+        col.appendChild(h5El);
+        col.appendChild(icon);
+        col.appendChild(temp);
+        col.appendChild(wind);
+        col.appendChild(humidity);
+    }
+
+    futureForecast.appendChild(row);
 };
 
 cityFormEl.addEventListener('submit', formSubmitHandler);
