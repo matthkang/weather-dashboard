@@ -13,7 +13,8 @@
     --black: #000;
     --white: #fff;
     --border-radius: 0.3rem;
-    --light-blue: #2589bd;
+    --light-blue: #cae9fa;
+    --blue: #0072bb;
 }
 
 
@@ -48,6 +49,10 @@ header {
     padding: 2.5%;
 }
 
+.lightblue-bg {
+    background-color: var(--light-blue);
+}
+
 
 a {
     color: #ffffff;
@@ -71,13 +76,26 @@ p {
 
 .search {
     margin-left: 20px;
+    margin-top: 20px;
     padding: 20px;
     clear: both;
     float: left;
     width: 20%;
     height: 100%;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    background-color: var(--light-blue);
+    background-color: var(--blue);
+}
+
+.history {
+    margin-left: 20px;
+    margin-top: 20px;
+    padding: 20px;
+    clear: both;
+    float: left;
+    width: 20%;
+    height: 100%;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: var(--blue);
 }
 
 
@@ -104,23 +122,31 @@ p {
     transform: translate(-1px, -1px);
 }
 
-.content {
+.history-div {
+    padding: 6px 5px;
+    width: 100%;
+    margin: 5px 0;
+}
+
+
+.forecast {
     width: 75%;
     display: inline-block;
     margin-left: 20px;
+    margin-top: 20px;
 }
 
 /* individual 3 content sections */
-.content-section {
+.forecast-section {
     margin-bottom: 20px;
     padding: 50px;
     height: 300px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    background-color: #0072bb;
+    background-color: var(--blue);
     color: #ffffff;
 }
 
-.content-section h2 {
+.forecast-section h2 {
     margin-bottom: 20px;
     font-size: 36px;
 }
