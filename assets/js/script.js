@@ -10,10 +10,6 @@ var currentTemp = document.querySelector('#temp');
 var currentWind = document.querySelector('#wind');
 var currentHumidity = document.querySelector('#humidity');
 
-// objs to store in local storage
-// var currentWeatherObj;
-// var futureWeatherObj;
-
 var city;
 
 var todayDate = dayjs().format('MM/DD/YYYY');
@@ -27,14 +23,12 @@ var formSubmitHandler = function (event) {
     city = cityInputEl.value.trim();
 
     if (city) {
+        cityInputEl.value = '';
+
         saveLocalStorage(city);
         getCoords(city);
         renderHistory();
 
-        presentForecast.textContent = '';
-        futureForecast.textContent = '';
-
-        cityInputEl.value = '';
     } else {
         alert('Please enter a city');
     }
@@ -42,22 +36,14 @@ var formSubmitHandler = function (event) {
 
 function saveLocalStorage(city) {
     // add city to localStorage
-    var cityStorage = localStorage.getItem("cities");
-
-    // retrieve arr from localStorage or create new arr
-    if (cityStorage !== null) {
-        var citiesArr = JSON.parse(cityStorage);
-    }
-    else {
-        var citiesArr = [];
-    }
+    // if empty, then set to an empty arr
+    var citiesArr = JSON.parse(localStorage.getItem("cities")) || [];
 
     let exists = false;
 
     // check if city exists already in localStorage
-    for (var i = 0; i < citiesArr.length; i++) {
-        // if city already exists
-        if (citiesArr.includes(city)) {
+    for (const savedCity of citiesArr) {
+        if (savedCity === city) {
             exists = true;
         }
     }
@@ -69,8 +55,6 @@ function saveLocalStorage(city) {
 
     localStorage.setItem("cities", JSON.stringify(citiesArr));
 }
-
-
 
 // get coords from city input using geocoding API
 var getCoords = function (city) {
@@ -121,55 +105,20 @@ var getCurrentWeather = function (lat, lon) {
 };
 
 var displayCurrentWeather = function (data) {
-    // set current city name and weather icon
+    // empty before displaying
+    $("#present-forecast").empty();
+
     var date = ' (' + todayDate + ')';
-    var h3City = document.createElement('h3');
-    h3City.setAttribute('id', 'city');
-    city += date;
-    h3City.textContent += (city);
 
-    var val = data.weather[0].icon,
-        src = 'https://openweathermap.org/img/wn/' + val + '@2x.png',
-        img = document.createElement('img');
+    var html = $(`
+        <h3 id="city">${city} ${date}<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png"></h3>
+        <h3 id="temp">Temp: ${data.main.temp} °F</h3>
+        <h3 id="wind">Wind: ${data.wind.speed} MPH</h3>
+        <h3 id="humidity">Humidity: ${data.main.humidity}%</h3>
+    `)
 
-    img.src = src;
-    var weatherIcon = img;
-    h3City.append(weatherIcon);
-    presentForecast.appendChild(h3City);
-
-    var temp = data.main.temp;
-    var wind = data.wind.speed;
-    var humidity = data.main.humidity;
-
-    // currentWeatherObj = {
-    //     city: city,
-    //     weatherIcon: weatherIcon,
-    //     temp: temp,
-    //     wind: wind,
-    //     humidity: humidity,
-    // };
-
-    // console.log(currentWeatherObj);
-
-    var h3Temp = document.createElement('h3');
-    h3Temp.setAttribute('id', 'temp');
-
-    var h3Wind = document.createElement('h3');
-    h3Wind.setAttribute('id', 'wind');
-
-    var h3Humidity = document.createElement('h3');
-    h3Humidity.setAttribute('id', 'humidity');
-
-
-    h3Temp.textContent = ("Temp: " + temp + ' °F');
-    h3Wind.textContent = ("Wind: " + wind + ' MPH');
-    h3Humidity.textContent = ("Humidity: " + humidity + '%');
-
-    presentForecast.appendChild(h3Temp);
-    presentForecast.appendChild(h3Wind);
-    presentForecast.appendChild(h3Humidity);
-};
-
+    $("#present-forecast").append(html);
+}
 
 // use coords to get 5 day weather forecast
 var get5DayWeather = function (lat, lon) {
@@ -193,71 +142,32 @@ var get5DayWeather = function (lat, lon) {
 };
 
 var display5DayForecast = function (data) {
-    var row = document.createElement('div');
-    row.classList = 'row';
+    $("#future-forecast").empty();
 
-    for (var i = 1; i < 6; i++) {
-        var col = document.createElement('div');
-        col.classList = 'col card';
+    var row = $(`
+        <div class="row">
+    `)
 
-        // add date for next 5 days
-        var h5El = document.createElement('h5');
-        h5El.setAttribute('id', 'date-' + i);
-        h5El.classList = 'card-header text-uppercase lightblue-bg';
-
-        var date = dayjs().add(i, 'day').format('MM/DD/YYYY');
-        h5El.textContent = date;
-
-        // weather icon
-        var icon = document.createElement('span');
-        icon.setAttribute('id', 'icon-' + i);
-
+    for (var i = 1; i < 6; i++){
         var ind = (i - 1) * 8;
         var dataIndex = data.list[ind];
-        var val = dataIndex.weather[0].icon,
-            src = 'https://openweathermap.org/img/wn/' + val + '@2x.png',
-            img = document.createElement('img');
 
-        img.src = src;
-        var weatherIcon = img;
-        h5El.appendChild(weatherIcon);
+        var date = dayjs().add(i, 'day').format('MM/DD/YYYY');
 
-        var tempVal = dataIndex.main.temp;
-        var windVal = dataIndex.wind.speed;
-        var humidityVal = dataIndex.main.humidity;
-
-        // futureWeatherObj = {
-        //     date: date,
-        //     weatherIcon: weatherIcon,
-        //     temp: tempVal,
-        //     wind: windVal,
-        //     humidity: humidityVal,
-        // }
-        // console.log("futureWeatherObj: ", futureWeatherObj);
-
-        // temperature
-        var temp = document.createElement('h6');
-        temp.setAttribute('id', 'temp-' + i);
-        temp.textContent = ("Temp: " + tempVal + ' °F');
-        // wind
-        var wind = document.createElement('h6');
-        wind.setAttribute('id', 'wind-' + i);
-        wind.textContent = ("Wind: " + windVal + ' MPH');
-        // humidity
-        var humidity = document.createElement('h6');
-        humidity.setAttribute('id', 'humidity-' + i);
-        humidity.textContent = ("Humidity: " + humidityVal + '%');
-
-        row.appendChild(col);
-        col.appendChild(h5El);
-        col.appendChild(icon);
-        col.appendChild(temp);
-        col.appendChild(wind);
-        col.appendChild(humidity);
+        var card = $(`
+            <div class="col card">
+                <h5 id="date-${i}" class="card-header text-uppercase lightblue-bg">${date}<img
+                        src="https://openweathermap.org/img/wn/03n@2x.png"></h5><span id="icon-${i}"></span>
+                <h6 id="temp-${i}">Temp: ${dataIndex.main.temp} °F</h6>
+                <h6 id="wind-${i}">Wind: ${dataIndex.wind.speed} MPH</h6>
+                <h6 id="humidity-${i}">Humidity: ${dataIndex.main.humidity}%</h6>
+            </div>
+        `)
+        row.append(card);
     }
+    $("#future-forecast").append(row);
+}
 
-    futureForecast.appendChild(row);
-};
 
 function renderHistory() {
     var cityStorage = localStorage.getItem("cities");
@@ -271,44 +181,27 @@ function renderHistory() {
     // adding buttons for searched cities
     if (cityStorage !== null) {
         for (var i = 0; i < citiesArr.length; i++) {
-            var containerDiv = document.createElement('div');
-            containerDiv.classList = "container";
+            var html = $(`
+            <div class="container">
+                <div class="row history-div">
+                    <div class="col-9"><button class="btn btn-secondary">${citiesArr[i]}</button></div>
+                    <div class="col-3"><button class="btn btn-danger">X</button></div>
+                </div>
+            </div>
+            `)
 
-            var historyDiv = document.createElement('div');
-            historyDiv.classList = "row history-div";
-
-            var btnDiv = document.createElement('div');
-            btnDiv.classList = "col-9";
-
-            var btnDeleteDiv = document.createElement('div');
-            btnDeleteDiv.classList = "col-3";
-
-            var historyBtn = document.createElement('button');
-            historyBtn.classList = "btn btn-secondary";
-            historyBtn.textContent = citiesArr[i];
-
-            var deleteBtn = document.createElement('button');
-            deleteBtn.classList = "btn btn-danger";
-            deleteBtn.textContent = "X";
-
-            containerDiv.appendChild(historyDiv);
-            btnDiv.appendChild(historyBtn);
-
-            btnDeleteDiv.appendChild(deleteBtn);
-
-            historyDiv.appendChild(btnDiv);
-            historyDiv.appendChild(btnDeleteDiv);
-
-            recentSearchesEl.appendChild(containerDiv);
+            $("#recent-searches").append(html);
         }
     }
 }
 
-$(document).ready(function() {
-    var historyButton = $(".btn-secondary");
-    var deleteButton = $(".btn-danger");
+$(document).ready(function () {
+    // assumes that these elements are already in the html 
+    // var historyButton = $(".btn-secondary");
+    // var deleteButton = $(".btn-danger");
 
-    historyButton.click(function(event){
+    // city history button
+    $("#recent-searches").on("click", ".btn-secondary", function (event) {
         var cityHistory = event.target.textContent;
         city = cityHistory;
 
@@ -319,7 +212,8 @@ $(document).ready(function() {
         getCoords(cityHistory);
     });
 
-    deleteButton.click(function(event){
+    // delete button
+    $("#recent-searches").on("click", ".btn-danger", function (event) {
         var cityToDelete = $(this).parent().parent().children()[0].textContent;
         var cityStorage = localStorage.getItem("cities");
         var citiesArr = JSON.parse(cityStorage);
@@ -328,7 +222,7 @@ $(document).ready(function() {
         const index = citiesArr.indexOf(cityToDelete);
 
         // delete if item is found
-        if (index > -1){
+        if (index > -1) {
             // 2nd parameter to remove one item only
             citiesArr.splice(index, 1);
         }
