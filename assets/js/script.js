@@ -60,7 +60,7 @@ function saveLocalStorage(city) {
 var getCoords = function (city) {
     var limit = 1;
 
-    var apiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=${limit}&appid=${apiKey}`;
+    var apiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=${limit}&appid=${apiKey}`;
 
     fetch(apiUrl)
         .then(function (response) {

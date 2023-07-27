@@ -11,7 +11,7 @@
 - Searched cities will be saved in localStorage and can be accessed through a search history for future reference
 
 ## Link to deployed application
-
+https://matthkang.github.io/weather-dashboard/
 
 
 ## Table of Contents (Optional)
